@@ -1,23 +1,23 @@
 kind: pipeline
 name: default
 steps:
-  - name: test
-    image: python:3.7-alpine
+  - name: go
+    image: golang:alpine
     commands:
-      - "python test.py"
+      - go run main.go
 
-  # - name: publish
-  #   image: plugins/docker
-  #   settings:
-  #       mirror: https://cm2sd473.mirror.aliyuncs.com
-  #       repo: registry:5000/flask
-  #       registry: registry:5000
-  #       insecure: true
-  #       tags: [ "${DRONE_COMMIT_SHA:0:7}","latest" ]
-  #       password:
-  #         from_secret: docker_password
-  #       username:
-  #         from_secret: docker_username
+  - name: publish
+    image: plugins/docker
+    settings:
+        mirror: https://cm2sd473.mirror.aliyuncs.com
+        repo: registry:5000/flask
+        registry: registry:5000
+        insecure: true
+        tags: [ "${DRONE_COMMIT_SHA:0:7}","latest" ]
+        password:
+          from_secret: docker_password
+        username:
+          from_secret: docker_username
 
   - name: deliver
     image: sinlead/drone-kubectl
