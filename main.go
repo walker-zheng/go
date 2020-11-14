@@ -1,3 +1,8 @@
+package main
+import (
+  "fmt"
+)
+
 func sum(nums ...int) {
     fmt.Print(nums, " ")  //输出如 [1, 2, 3] 之类的数组
     total := 0
