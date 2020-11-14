@@ -1,0 +1,43 @@
+kind: pipeline
+name: default
+steps:
+  - name: test
+    image: python:3.7-alpine
+    commands:
+      - "python test.py"
+
+  # - name: publish
+  #   image: plugins/docker
+  #   settings:
+  #       mirror: https://cm2sd473.mirror.aliyuncs.com
+  #       repo: registry:5000/flask
+  #       registry: registry:5000
+  #       insecure: true
+  #       tags: [ "${DRONE_COMMIT_SHA:0:7}","latest" ]
+  #       password:
+  #         from_secret: docker_password
+  #       username:
+  #         from_secret: docker_username
+
+  - name: deliver
+    image: sinlead/drone-kubectl
+    network_mode: bridge
+    environment:
+        PLUGIN_KUBERNETES_SERVER: https://minikube:8443
+        PLUGIN_KUBERNETES_USER: minikube
+        # PLUGIN_KUBERNETES_TOKEN: minikube
+        # PLUGIN_KUBERNETES_CERT: minikube
+    settings:
+        mirror: https://cm2sd473.mirror.aliyuncs.com
+        kubernetes_server:
+          from_secret: k8s_server
+        kubernetes_cert:
+          from_secret: k8s_cert
+        kubernetes_token:
+          from_secret: k8s_token
+    commands:
+        # - env
+        - kubectl config view
+        - kubectl version --short
+        # - kubectl create deployment flask-deployment --image=localhost:5000/flask:latest --output=yaml
+        - kubectl apply -f deployment.yml
